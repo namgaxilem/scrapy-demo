@@ -1,1 +1,6 @@
 scapy-demo-env/
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/scrapy-demo.iml
+/.idea/vcs.xml
