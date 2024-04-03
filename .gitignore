@@ -1,6 +1,14 @@
 scapy-demo-env/
+.venv/
+**/__pycache__/
+
 /.idea/.gitignore
 /.idea/misc.xml
 /.idea/modules.xml
-/.idea/scrapy-demo.iml
+/.idea/site_search_poc.iml
+/testiresult.json
 /.idea/vcs.xml
+
+
+# All Result json file
+*.json
