@@ -102,8 +102,18 @@ FEED_EXPORT_ENCODING = "utf-8"
 FEED_URI_PARAMS = "site_search_poc.utils.uri_params"
 
 FEEDS = {
-    'crawl_data/%(now_year)s/%(now_month)s/%(now_date)s/%(domain_name)s/%(batch_time)s-%(batch_id)d.json': {
+    # 'crawl_data/%(now_year)s/%(now_month)s/%(now_date)s/%(domain_name)s/%(batch_time)s-%(batch_id)d.json': {
+    #     'format': 'json',
+    #     'batch_item_count': 100,
+    #     },
+    'azure://scrapy0test.blob.core.windows.net/dhp-semantic-search/%(now_year)s/%(now_month)s/%(now_date)s/%(domain_name)s/%(batch_time)s-%(batch_id)d.json': {
         'format': 'json',
-        'batch_item_count': 1,
+        'batch_item_count': 100,
         }
 }
+
+FEED_STORAGES = {'azure': 'scrapy_azure_exporter.AzureFeedStorage'}
+
+# AZURE_ACCOUNT_URL = "https://<your-storage-account-name>.blob.core.windows.net/"
+# AZURE_ACCOUNT_KEY = "Account key for the Azure account"
+AZURE_CONNECTION_STRING = 'replace_me_here'
