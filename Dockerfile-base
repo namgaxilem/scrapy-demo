@@ -1,0 +1,21 @@
+FROM python:3.9-slim-bullseye
+
+# Set the working directory in the container to /app
+WORKDIR /app
+
+RUN apt update
+RUN apt install git -y
+
+# Install any needed packages specified in requirements.txt
+RUN pip install scrapy-playwright
+RUN playwright install chromium
+RUN playwright install-deps
+RUN pip install wheel
+RUN pip install git+https://github.com/scrapy-plugins/scrapy-feedexporter-azure-storage
+RUN pip install scrapy_azure_exporter
+
+# Make port 80 available to the world outside this container
+EXPOSE 80
+# Run scrapy when the container launches
+
+CMD ["scrapy", "crawl", "mySpider"]
