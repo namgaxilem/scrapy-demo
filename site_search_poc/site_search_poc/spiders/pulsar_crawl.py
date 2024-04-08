@@ -23,6 +23,11 @@ class PulsarSpider(CrawlSpider):
     #     }
     # }
     
+    custom_settings = {
+        'LOG_FILE': 'logs/pulsar_spider.log',
+        'LOG_LEVEL': 'DEBUG'
+    }
+    
     def start_requests(self):
         url = self.start_urls[0]
         yield Request(url, meta={'playwright': True})

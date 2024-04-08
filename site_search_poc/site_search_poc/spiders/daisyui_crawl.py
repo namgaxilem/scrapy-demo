@@ -1,62 +1,31 @@
-from scrapy import Request
-from scrapy.spiders import CrawlSpider, Rule
+from scrapy.spiders import Rule
 from scrapy.linkextractors import LinkExtractor
+from scrapy_redis.spiders import RedisCrawlSpider
 
-class PulsarSpider(CrawlSpider):
-    name = "daisyui"
-    allowed_domains = ["daisyui.com"]
-    start_urls = ["https://daisyui.com/docs"]
-    base_url = 'https://daisyui.com'
-    domain_name = "daisyui.com"
+class MyCrawler(RedisCrawlSpider):
+    """Spider that reads urls from redis queue (myspider:start_urls)."""
+    name = 'daisyui'
+    redis_key = 'mycrawler:start_urls'
     
-    rules = [
-        Rule(LinkExtractor(allow='docs/'), callback='parse_docs', follow=True),
-        # Rule(LinkExtractor(deny='.*#.*'))
-    ]
-    
-    # custom_settings = {
-	# 	'FEEDS': { 
-    #         'crawl_data/%(now_year)s/%(now_month)s/%(now_date)s/%(domain_name)s/%(batch_time)s-%(batch_id)d.json': { 
-    #             'format': 'json', 
-    #             'batch_item_count': 1
-    #         }
-    #     }
-    # }
-    
-    def start_requests(self):
-        url = self.start_urls[0]
-        yield Request(url, meta={'playwright': True, "playwright_context_kwargs": {
-                    "ignore_https_errors": True,
-                },})
+    custom_settings = {
+        'LOG_FILE': 'logs/logging.log',
+        'LOG_LEVEL': 'DEBUG'
+    }
 
-    def parse_docs(self, response):
-        print(response.url)
-        # menuContentList = response.xpath('//*[contains(@class, "menu thin-scrollbar")]/*//a[@href]/text()').extract()
-        # for content in menuContentList:
-        #     yield {"content": content }
-        # links = response.xpath('//*[contains(@class, "theme-doc-sidebar-menu")]/*//a[@href]')
-        
-        links = response.xpath('//*/a')
-        for link in links:
-            href = link.xpath('.//@href').extract_first()
-            book_url = self.base_url + href
-            yield Request(book_url, callback=self.parse_docs) 
-        
-        url = response.url
-        title = response.xpath('//html/head/title/text()').extract_first()
-        headings = response.xpath('//*[self::h1 or self::h2 or self::h3 or self::h4 or self::h5 or self::h6]/text()').extract()
-        metaDescription = response.xpath('//meta[@name="description"]/@content').extract_first()
-        
-        paragraphs = []
-        for p in response.css("p::text").getall():
-            p1 = p.strip()
-            if len(p1) !=0 :
-                paragraphs.append(p1.replace("\n", ""))
-        
-        yield {
-            "url": url,
-            "title": title,
-            "metaDescription": metaDescription,
-            "headings": headings,
-            "paragraphs": paragraphs
-        }    
+    rules = (
+        Rule(LinkExtractor(allow = '/'), callback='parse', follow=True),
+    )
+
+    # def __init__(self, *args, **kwargs):
+    #     # Dynamically define the allowed domains list.
+    #     domain = kwargs.pop('domain', '')
+    #     self.allowed_domains = filter(None, domain.split(','))
+    #     super(MyCrawler, self).__init__(*args, **kwargs)
+
+    def parse(self, response):
+        for quote in response.css('div.quote'):
+            yield {
+                'text': quote.css('span.text::text').get(),
+                'author': quote.css('small.author::text').get(),
+                'tags': quote.css('div.tags a.tag::text').getall(),
+            }

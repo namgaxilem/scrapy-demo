@@ -14,6 +14,9 @@ RUN pip install wheel
 RUN pip install git+https://github.com/scrapy-plugins/scrapy-feedexporter-azure-storage
 RUN pip install scrapy_azure_exporter
 
+RUN pip install scrapy-redis
+RUN pip install redis
+
 # Make port 80 available to the world outside this container
 EXPOSE 80
 # Run scrapy when the container launches

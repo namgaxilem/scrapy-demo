@@ -102,18 +102,33 @@ FEED_EXPORT_ENCODING = "utf-8"
 FEED_URI_PARAMS = "site_search_poc.utils.uri_params"
 
 FEEDS = {
-    # 'crawl_data/%(now_year)s/%(now_month)s/%(now_date)s/%(domain_name)s/%(batch_time)s-%(batch_id)d.json': {
-    #     'format': 'json',
-    #     'batch_item_count': 100,
-    #     },
-    'azure://scrapy0test.blob.core.windows.net/dhp-semantic-search/%(now_year)s/%(now_month)s/%(now_date)s/%(domain_name)s/%(batch_time)s-%(batch_id)d.json': {
+    'crawl_data/%(now_year)s/%(now_month)s/%(now_date)s/%(domain_name)s/%(batch_time)s-%(batch_id)d.json': {
         'format': 'json',
         'batch_item_count': 100,
-        }
+        },
+    # 'azure://scrapy0test.blob.core.windows.net/dhp-semantic-search/%(now_year)s/%(now_month)s/%(now_date)s/%(domain_name)s/%(batch_time)s-%(batch_id)d.json': {
+    #     'format': 'json',
+    #     'batch_item_count': 100,
+    #     }
 }
 
-FEED_STORAGES = {'azure': 'scrapy_azure_exporter.AzureFeedStorage'}
+# FEED_STORAGES = {'azure': 'scrapy_azure_exporter.AzureFeedStorage'}
 
 # AZURE_ACCOUNT_URL = "https://<your-storage-account-name>.blob.core.windows.net/"
 # AZURE_ACCOUNT_KEY = "Account key for the Azure account"
-AZURE_CONNECTION_STRING = 'replace_me_here'
+# AZURE_CONNECTION_STRING = 'replace_me_here'
+
+# Enables scheduling storing requests queue in redis.
+SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+
+# Ensure all spiders share same duplicates filter through redis.
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+
+REDIS_START_URLS_KEY = 'mycrawler:start_urls'
+REDIS_PARAMS = {
+    'host': 'scrapy-demo.redis.cache.windows.net',
+    'port': 6380,
+    'password': '',
+}
+SCHEDULER_PERSIST = True # Don't cleanup redis queues, allows to pause/resume crawls.
+SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.FifoQueue' # First-In-First-Out (FIFO) Queue
